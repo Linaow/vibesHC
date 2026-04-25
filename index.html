@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principia: Newton's Universe</title>
+    <style>
+        /* The progress container (background) */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            z-index: 2000; /* Higher than the nav */
+            width: 100%;
+            height: 4px;
+            background: transparent;
+        }
+
+        /* The actual progress bar */
+        .progress-bar {
+            height: 4px;
+            background: var(--accent-physics);
+            box-shadow: 0 0 10px var(--accent-physics);
+            width: 0%; /* Starts at 0 */
+        }        
+        :root {
+            --primary-bg: #46055a;
+            --accent-apple: #ef4444;
+            --accent-physics: #c538f8;
+            --text-light: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'times new roman', Roboto, Helvetica, Arial, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section with Floating Animation */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #46055a 0%, #0f172a 100%);
+            position: relative;
+        }
+
+        .floating-apple {
+            font-size: 5rem;
+            animation: float 4s ease-in-out infinite;
+            cursor: pointer;
+            filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.4));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(15deg); }
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin: 20px 0;
+            background: linear-gradient(90deg, #38f8c2, #dc81f8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            background: #46055a;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        nav a:hover { color: var(--accent-physics); }
+
+        /* Content Sections */
+        section {
+            padding: 100px 10%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .law-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 50px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .law-card:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-physics);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .law-number {
+            font-size: 6rem;
+            position: absolute;
+            right: 20px;
+            top: -10px;
+            opacity: 0.05;
+            color: var(--accent-physics);
+            font-weight: bold;
+        }
+
+        .formula {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            color: var(--accent-physics);
+            margin: 20px 0;
+            font-size: 1.3rem;
+            border-left: 4px solid var(--accent-physics);
+        }
+
+        /* Grid for Derived Laws */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .mini-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+
+        .mini-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Scroll Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px;
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            section { padding: 60px 5%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="myBar"></div>
+    </div>
+    <nav>
+        <a href="#hero">HOME</a>
+        <a href="#laws">THREE LAWS</a>
+        <a href="#derived">DERIVED PHYSICS</a>
+        <a href="#legacy">IMPACT</a>
+    </nav>
+
+    <header id="hero">
+    <div class="floating-apple" id="apple" onclick="dropApple()">🍎</div>
+    <h1>Newton's Universe</h1>
+    <p>The Mathematical Principles of Natural Philosophy</p>
+    <p style="margin-top: 20px; font-size: 0.8rem; color: var(--accent-physics); cursor: pointer;" onclick="dropApple()">
+        Click the apple to test gravity
+    </p>
+</header>
+
+<script>
+    function dropApple() {
+        const apple = document.getElementById('apple');
+        
+        // Remove the floating animation so it doesn't fight the fall
+        apple.style.animation = 'none';
+        
+        // Physics-based fall animation
+        apple.animate([
+            { transform: 'translateY(0) rotate(0deg)' },
+            { transform: 'translateY(400px) rotate(20deg)', offset: 0.6 },
+            { transform: 'translateY(350px) rotate(40deg)', offset: 0.8 },
+            { transform: 'translateY(400px) rotate(60deg)', offset: 1 }
+        ], {
+            duration: 1000,
+            easing: 'ease-in',
+            fill: 'forwards'
+        });
+
+        // Add a little alert to show the Law of Gravity in action
+        setTimeout(() => {
+            alert("Gravity works! 'What goes up, must come down.'");
+            // Reset the apple after 3 seconds
+            setTimeout(() => {
+                apple.style.animation = 'float 4s ease-in-out infinite';
+            }, 2000);
+        }, 1100);
+    }
+
+    // Keep your Scroll Reveal Logic here as well
+    function reveal() {
+        var reveals = document.querySelectorAll(".reveal");
+        for (var i = 0; i < reveals.length; i++) {
+            var windowHeight = window.innerHeight;
+            var elementTop = reveals[i].getBoundingClientRect().top;
+            if (elementTop < windowHeight - 150) {
+                reveals[i].classList.add("active");
+            }
+        }
+    }
+    window.addEventListener("scroll", reveal);
+    reveal(); 
+</script>
+        <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/newtons-laws-of-motion/">
+    <section id="laws">
+            <h2 style="text-align:center; margin-bottom: 60px; font-size: 2rem;">The Foundations of Motion</h2>
+        </a>
+        <div class="law-card reveal">
+            <div class="law-number">01</div>
+            <h3>I. Law of Inertia</h3>
+            <p>Objects are lazy. They want to keep doing exactly what they are already doing unless a force forces them to change.</p>
+            <div class="formula">∑F = 0 → Δv = 0</div>
+        </div>
+
+        <div class="law-card reveal">
+            <div class="law-number">02</div>
+            <h3>II. Law of Acceleration</h3>
+            <p>Force is the product of mass and acceleration. To move something heavy quickly, you need a lot of "oomph".</p>
+            <div class="formula">F = m × a</div>
+        </div>
+
+        <div class="law-card reveal">
+            <div class="law-number">03</div>
+            <h3>III. Action & Reaction</h3>
+            <p>You can't touch something without it touching you back just as hard. Nature is perfectly balanced.</p>
+            <div class="formula">F<sub>A</sub> = -F<sub>B</sub></div>
+        </div>
+
+    </section>
+
+    <section id="derived" style="background: rgba(255,255,255,0.02); border-radius: 50px;">
+        <h2 style="text-align:center; margin-bottom: 40px;">Derived Truths</h2>
+        <div class="grid">
+            <div class="mini-card reveal">
+                <h4>Universal Gravitation</h4>
+                <p>The invisible thread connecting apples to planets.</p>
+                <div class="formula" style="font-size: 1rem;">F = G(m₁m₂/r²)</div>
+            </div>
+            <div class="mini-card reveal">
+                <h4>Momentum</h4>
+                <p>The "unstoppability" of an object in motion.</p>
+                <div class="formula" style="font-size: 1rem;">p = m × v</div>
+            </div>
+            <div class="mini-card reveal">
+                <h4>Centripetal Force</h4>
+                <p>The center-seeking force that keeps orbits circular.</p>
+                <div class="formula" style="font-size: 1rem;">F = mv²/r</div>
+            </div>
+            <div class="mini-card reveal">
+                <h4>Kinetic Energy</h4>
+                <p>The energy an object possesses due to its motion, derived from Work and Law II.</p>
+                <div class="formula" style="font-size: 1rem;">KE = ½mv²</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="legacy" style="text-align: center;">
+        <h2 style="margin-bottom: 30px; color: var(--accent-physics);">The Modern Fingerprint</h2>
+        <p style="max-width: 750px; margin: 0 auto; font-size: 1.1rem; opacity: 0.9;">
+            Newton didn't just discover gravity; he invented a way to <strong>predict the future</strong>. 
+            By turning physical movement into geometry and calculus, he allowed us to build bridges that don't fall, 
+            engines that power nations, and rockets that reach the stars. Modern science is simply a 
+            series of footnotes to Newton's <em>Principia</em>.
+        </p>
+    </section>
+    <section id="game" style="text-align: center; background: rgba(56, 189, 248, 0.05); border-radius: 50px; padding: 50px; margin-top: 50px;">
+    <h2 style="color: var(--accent-physics); margin-bottom: 10px;">Newton's Challenge: Escape Velocity</h2>
+    <p>Newton's 2nd Law says <strong>F = ma</strong>. Click the apple rapidly to apply Force and beat Gravity!</p>
+    
+    <div id="game-arena" style="height: 300px; position: relative; overflow: hidden; border-bottom: 3px solid var(--accent-physics); margin: 30px auto; background: rgba(0,0,0,0.2); max-width: 600px; border-radius: 15px;">
+        <div id="game-apple" style="font-size: 3.5rem; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); cursor: pointer; user-select: none; transition: bottom 0.03s linear;">🍎</div>
+    </div>
+    
+    <div id="status-board">
+        <p style="font-size: 1.2rem;">Current Velocity: <span id="speed" style="color: var(--accent-physics); font-weight: bold;">0</span> m/s</p>
+        <p id="game-message" style="margin-top: 10px; font-weight: bold;">Can you reach 100 m/s to escape?</p>
+        <button class="btn" onclick="resetGame()" style="background: #475569; margin-top: 15px; padding: 8px 20px; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset Experiment</button>
+    </div>
+    </section>
+
+    <footer>
+        <p>Built for the curious mind. &copy; 2026 Physics Interactive</p>
+    </footer>
+
+    <script>
+        // Scroll Reveal Logic
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+
+        window.addEventListener("scroll", reveal);
+        // Run once on load
+        reveal();
+    let velocity = 0;
+    const gravity = 0.8;      // Downward acceleration
+    const enginePower = 15;   // Force added per click
+    
+    const appleEl = document.getElementById('game-apple');
+    const speedEl = document.getElementById('speed');
+    const messageEl = document.getElementById('game-message');
+
+    // Main Physics Loop (Runs 33 times per second)
+    setInterval(() => {
+        let currentBottom = parseFloat(appleEl.style.bottom) || 0;
+
+        if (velocity !== 0 || currentBottom > 0) {
+            // Apply Gravity Rule
+            velocity -= gravity;
+            let newBottom = currentBottom + velocity;
+
+            // Collision with ground rule
+            if (newBottom <= 0) {
+                newBottom = 0;
+                velocity = 0;
+            }
+
+            appleEl.style.bottom = newBottom + "px";
+            speedEl.innerText = Math.max(0, Math.floor(velocity));
+            
+            // Win Condition
+            if (velocity > 100) {
+                messageEl.innerText = "SUCCESS! You reached escape velocity! 🚀";
+                messageEl.style.color = "#4ade80";
+            }
+        }
+    }, 30);
+
+    // Apply Force on Click
+    appleEl.addEventListener('mousedown', () => {
+        velocity += enginePower;
+        if (velocity <= 100) {
+            messageEl.innerText = "Applying Force... Keep clicking!";
+            messageEl.style.color = "white";
+        }
+    });
+
+    function resetGame() {
+        velocity = 0;
+        appleEl.style.bottom = "0px";
+        messageEl.innerText = "Can you reach 100 m/s to escape?";
+        messageEl.style.color = "white";
+    }
+
+    // Standard Scroll Reveal Logic
+    function reveal() {
+        var reveals = document.querySelectorAll(".reveal");
+        for (var i = 0; i < reveals.length; i++) {
+            var windowHeight = window.innerHeight;
+            var elementTop = reveals[i].getBoundingClientRect().top;
+            if (elementTop < windowHeight - 150) {
+                reveals[i].classList.add("active");
+            }
+        }
+    }
+    window.addEventListener("scroll", reveal);
+    reveal(); 
+    window.onscroll = function() { updateProgress() };
+
+    function updateProgress() {
+    var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    var scrolled = (winScroll / height) * 100;
+    document.getElementById("myBar").style.width = scrolled + "%";
+    
+    // Also call your existing reveal function here if it's not already being called
+    if (typeof reveal === "function") { reveal(); }
+    }
+
+    </script>
+</body>
+</html>
